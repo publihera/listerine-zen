@@ -1,0 +1,19 @@
+{
+  "name": "sereno-app-som-tranquilo",
+  "version": "1.0.0",
+  "description": "Aplicativo que capta o som externo e transforma em música tranquila e suave",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 server.py"
+  },
+  "keywords": [
+    "web-audio-api",
+    "ambient-music",
+    "sound-to-music",
+    "relaxing",
+    "generative-music",
+    "meditation"
+  ],
+  "author": "Sereno",
+  "license": "MIT"
+}

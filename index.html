@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sereno • Transformador de Som Ambiente em Música Serena</title>
+  <meta name="description" content="Grave o som ambiente barulhento, escolha um tema pré-setado e transforme em música calma e relaxante. Crie playlists e compartilhe com os amigos.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+</head>
+<body class="spotify-layout">
+  <!-- Espiral Zen Luminous Ambient em Segundo Plano -->
+  <div class="zen-spiral-ambient-container">
+    <div class="zen-spiral-disc"></div>
+  </div>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="ambient-glow glow-3"></div>
+
+  <!-- Banner de Playlist Compartilhada (Aparece se abrir link compartilhado) -->
+  <div id="shared-banner" class="shared-banner hidden">
+    <div class="shared-banner-content">
+      <span class="shared-badge">✨ NOVIDADE</span>
+      <span id="shared-banner-text">Seu amigo compartilhou uma playlist com você!</span>
+      <div class="shared-banner-actions">
+        <button id="btn-import-shared" class="btn-primary-small">Salvar na Biblioteca</button>
+        <button id="btn-close-shared" class="btn-text">Dispensar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <!-- ====================================================================
+         BARRA LATERAL ESQUERDA (SIDEBAR ESTILO SPOTIFY)
+         ==================================================================== -->
+    <aside class="sidebar">
+      <!-- Logo do App (Listerine Zen) -->
+      <div class="sidebar-logo">
+        <div class="brand-container">
+          <img src="assets/listerine-logo.png" alt="Listerine" class="listerine-brand-logo">
+          <span class="logo-zen-pill">ZEN</span>
+        </div>
+        <p class="brand-tagline">Purificação Sonora & Calma</p>
+      </div>
+
+      <!-- Navegação Principal -->
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-view="transform" id="nav-btn-transform">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>Estúdio de Transformação</span>
+          <span class="badge-fase1">Fase 1</span>
+        </button>
+
+        <button class="nav-item" data-view="live" id="nav-btn-live">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5M12 12h.01M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5M19.1 4.9c3.9 3.9 3.9 10.3 0 14.2"></path>
+          </svg>
+          <span>Transmissor Ao Vivo</span>
+          <span class="live-pulse-dot" id="sidebar-live-dot"></span>
+        </button>
+
+        <button class="nav-item" data-view="explore" id="nav-btn-explore">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+          </svg>
+          <span>Explorar Paisagens</span>
+        </button>
+
+        <button class="nav-item" data-view="library" id="nav-btn-library">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span>Sua Biblioteca</span>
+        </button>
+      </nav>
+
+      <!-- Divisória e Ações de Playlist -->
+      <div class="sidebar-divider"></div>
+
+      <div class="sidebar-playlist-actions">
+        <button id="btn-modal-create-playlist" class="sidebar-action-btn">
+          <span class="action-icon-box create-icon">＋</span>
+          <span>Criar Playlist</span>
+        </button>
+
+        <button id="btn-liked-songs" class="sidebar-action-btn" data-playlist-id="liked-songs">
+          <span class="action-icon-box heart-icon">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+            </svg>
+          </span>
+          <span>Músicas Curtidas</span>
+        </button>
+      </div>
+
+      <!-- Lista Rolante de Playlists -->
+      <div class="sidebar-playlists-scroll" id="sidebar-playlists-list">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </aside>
+
+    <!-- ====================================================================
+         ÁREA PRINCIPAL DE CONTEÚDO (MAIN VIEWPORT)
+         ==================================================================== -->
+    <main class="main-viewport">
+      <!-- Barra Superior / Topbar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="view-title-pill">
+            <span id="current-view-title">Estúdio • Gravar Som & Transformar em Música</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button id="btn-theme-toggle" class="topbar-btn theme-toggle-btn" title="Alternar Modo Zen Claro / Escuro">
+            <span id="theme-toggle-icon">🌙</span>
+            <span id="theme-toggle-text">Modo Noturno</span>
+          </button>
+
+          <button id="topbar-share-btn" class="topbar-btn" title="Compartilhar Playlist">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="18" cy="5" r="3"></circle>
+              <circle cx="6" cy="12" r="3"></circle>
+              <circle cx="18" cy="19" r="3"></circle>
+              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+              <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+            </svg>
+            <span>Compartilhar</span>
+          </button>
+
+          <button id="btn-fullscreen" class="topbar-btn icon-only" title="Tela Cheia">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Conteúdo com Abas Alternáveis -->
+      <div class="views-wrapper">
+        <!-- ================================================================
+             ABA PRINCIPAL: ESTÚDIO DE TRANSFORMAÇÃO (GRAVAR -> TEMA -> TRANSFORMAR)
+             ================================================================ -->
+        <section id="view-transform" class="view-tab active">
+          <div class="studio-container">
+            <!-- Decoração Zen Stones & Bamboo Water no fundo direito (Fiel ao Mockup) -->
+            <div class="zen-stones-backdrop" aria-hidden="true">
+              <img src="assets/zen-stones-decor.png" alt="Pedras Zen & Lavanda" class="zen-stones-img">
+            </div>
+
+            <div class="studio-header">
+              <div class="lotus-header-icon-wrap">
+                <svg class="lotus-header-icon" viewBox="0 0 64 48" fill="none" stroke="#8b5cf6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M32 6 C32 6, 38 18, 38 29 C38 37, 35 41, 32 42 C29 41, 26 37, 26 29 C26 18, 32 6, 32 6 Z" />
+                  <path d="M29 17 C23 19, 15 27, 17 35 C18 39, 22 42, 28 42" />
+                  <path d="M35 17 C41 19, 49 27, 47 35 C46 39, 42 42, 36 42" />
+                  <path d="M21 25 C13 29, 7 35, 9 41 C10 43, 15 44, 24 43" />
+                  <path d="M43 25 C51 29, 57 35, 55 41 C54 43, 49 44, 40 43" />
+                  <path d="M22 43 C28 45, 36 45, 42 43" />
+                </svg>
+              </div>
+              <h1 class="main-page-title">Transformador <span class="highlight-purple">Acústico</span></h1>
+              <p class="main-page-desc">Grave o som ambiente do seu quarto, rua ou escritório, escolha um tema relaxante<br>e transforme o ruído em uma música calma e suave.</p>
+            </div>
+
+            <!-- PASSO 1: GRAVAÇÃO DO SOM AMBIENTE -->
+            <div class="step-card" id="card-step-record">
+              <div class="step-top-row">
+                <span class="step-badge">PASSO 1</span>
+              </div>
+              <div class="step-header">
+                <div class="step-icon-badge">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+                    <line x1="3" y1="10" x2="3" y2="14"></line>
+                    <line x1="7.5" y1="6" x2="7.5" y2="18"></line>
+                    <line x1="12" y1="3" x2="12" y2="21"></line>
+                    <line x1="16.5" y1="6" x2="16.5" y2="18"></line>
+                    <line x1="21" y1="10" x2="21" y2="14"></line>
+                  </svg>
+                </div>
+                <div class="step-header-text">
+                  <h3>Captar Som Ambiente</h3>
+                  <span class="step-desc">Grave alguns segundos de ruídos reais ao seu redor (vozes, cliques, trânsito, ar condicionado).</span>
+                </div>
+              </div>
+
+              <div class="record-box-inner">
+                <!-- Estado Não Gravando -->
+                <div id="record-state-idle" class="record-state-view">
+                  <div class="ripple-button-container">
+                    <div class="ripple-ring ring-3"></div>
+                    <div class="ripple-ring ring-2"></div>
+                    <div class="ripple-ring ring-1"></div>
+                    <button id="btn-start-record-studio" class="btn-record-large">
+                      <div class="mic-circle-pulse">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                          <line x1="12" y1="19" x2="12" y2="22"></line>
+                        </svg>
+                      </div>
+                      <span>Gravar Som Ambiente</span>
+                    </button>
+                  </div>
+
+                  <div class="sample-options-row">
+                    <span class="sample-prompt-text">Ou teste com um ruído pronto:</span>
+                    <div class="sample-pills-wrap">
+                      <button class="pill-sample-btn" data-sample="office"><span class="pill-btn-icon">💻</span> Escritório & Teclado</button>
+                      <button class="pill-sample-btn" data-sample="cafe"><span class="pill-btn-icon">☕</span> Cafeteria & Murmúrio</button>
+                      <button class="pill-sample-btn" data-sample="street"><span class="pill-btn-icon">🚗</span> Trânsito na Rua</button>
+                    </div>
+                    <div class="upload-pill-wrap">
+                      <label class="pill-sample-btn file-upload-label" title="Enviar arquivo de áudio">
+                        <span class="pill-btn-icon">▷</span> Enviar Áudio
+                        <input type="file" id="input-audio-file" accept="audio/*" style="display:none;">
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Estado Gravando Ao Vivo -->
+                <div id="record-state-recording" class="record-state-view hidden">
+                  <div class="recording-animation-box">
+                    <div class="recording-indicator-ring"></div>
+                    <span class="recording-timer" id="recording-live-timer">00:00</span>
+                    <span class="recording-status-msg">Ouvindo ruídos do ambiente...</span>
+                  </div>
+
+                  <div class="live-waveform-mini">
+                    <div class="live-wave-bar" style="height: 30%;"></div>
+                    <div class="live-wave-bar" style="height: 60%;"></div>
+                    <div class="live-wave-bar" style="height: 85%;"></div>
+                    <div class="live-wave-bar" style="height: 45%;"></div>
+                    <div class="live-wave-bar" style="height: 70%;"></div>
+                    <div class="live-wave-bar" style="height: 95%;"></div>
+                    <div class="live-wave-bar" style="height: 50%;"></div>
+                    <div class="live-wave-bar" style="height: 80%;"></div>
+                  </div>
+
+                  <button id="btn-stop-record-studio" class="btn-stop-record">
+                    <span class="stop-square"></span>
+                    <span>Concluir Gravação</span>
+                  </button>
+                </div>
+
+                <!-- Estado Áudio Pronto -->
+                <div id="record-state-ready" class="record-state-view hidden">
+                  <div class="ready-audio-pill">
+                    <span class="ready-icon">🎙️</span>
+                    <div class="ready-info">
+                      <strong id="ready-audio-name">Som Ambiente Gravado</strong>
+                      <small id="ready-audio-duration">Duração: 00:08s</small>
+                    </div>
+                    <button id="btn-play-preview-original" class="btn-preview-audio" title="Ouvir áudio original">
+                      <svg id="preview-play-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                      </svg>
+                      <svg id="preview-pause-icon" class="hidden" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16"></rect>
+                        <rect x="14" y="4" width="4" height="16"></rect>
+                      </svg>
+                      <span>Ouvir Ruído</span>
+                    </button>
+                    <button id="btn-re-record" class="btn-text-action" title="Gravar novamente">Descartar & Gravar Outro</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASSO 2: ESCOLHER TEMA PRÉ-SETADO -->
+            <div class="step-card" id="card-step-theme">
+              <div class="step-top-row">
+                <span class="step-badge">PASSO 2</span>
+              </div>
+              <div class="step-header">
+                <div class="step-icon-badge">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                    <line x1="4" y1="21" x2="4" y2="14"></line>
+                    <line x1="4" y1="10" x2="4" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12" y2="3"></line>
+                    <line x1="20" y1="21" x2="20" y2="16"></line>
+                    <line x1="20" y1="12" x2="20" y2="3"></line>
+                    <line x1="1" y1="14" x2="7" y2="14"></line>
+                    <line x1="9" y1="8" x2="15" y2="8"></line>
+                    <line x1="17" y1="16" x2="23" y2="16"></line>
+                  </svg>
+                </div>
+                <div class="step-header-text">
+                  <h3>Escolher Tema Musical Relaxante</h3>
+                  <span class="step-desc">Selecione a atmosfera e os instrumentos para transmutar o ruído.</span>
+                </div>
+              </div>
+
+              <div class="themes-grid">
+                <!-- Tema 1 -->
+                <div class="theme-card active" data-theme="zen">
+                  <div class="theme-icon">🎍</div>
+                  <div class="theme-info">
+                    <h4>Jardim Zen</h4>
+                    <p>Taças tibetanas, sinos de bambu e escala Hirajoshi contemplativa.</p>
+                  </div>
+                  <div class="theme-check">✓</div>
+                </div>
+
+                <!-- Tema 2 -->
+                <div class="theme-card" data-theme="celestial">
+                  <div class="theme-icon">✨</div>
+                  <div class="theme-info">
+                    <h4>Nuvem Celeste</h4>
+                    <p>Harpa etérea, shimmer espacial e harmonia cósmica Lydian.</p>
+                  </div>
+                  <div class="theme-check">✓</div>
+                </div>
+
+                <!-- Tema 3 -->
+                <div class="theme-card" data-theme="ocean">
+                  <div class="theme-icon">🌊</div>
+                  <div class="theme-info">
+                    <h4>Oceano Profundo</h4>
+                    <p>Marimba aveludada, ressonâncias aquáticas e modo Dórico.</p>
+                  </div>
+                  <div class="theme-check">✓</div>
+                </div>
+
+                <!-- Tema 4 -->
+                <div class="theme-card" data-theme="aurora">
+                  <div class="theme-icon">🌌</div>
+                  <div class="theme-info">
+                    <h4>Aurora Boreal</h4>
+                    <p>Teclas quentes tipo Rhodes e pentatônica maior pura e acolhedora.</p>
+                  </div>
+                  <div class="theme-check">✓</div>
+                </div>
+
+                <!-- Tema 5 -->
+                <div class="theme-card" data-theme="crystal">
+                  <div class="theme-icon">💎</div>
+                  <div class="theme-info">
+                    <h4>Chuva de Cristal</h4>
+                    <p>Sinos de vidro límpidos, gotas sonoras e acordes abertos.</p>
+                  </div>
+                  <div class="theme-check">✓</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PASSO 3: BOTÃO MÁGICO DE TRANSFORMAÇÃO -->
+            <div class="transform-action-row">
+              <button id="btn-transmute-action" class="btn-transform-hero" disabled>
+                <span class="sparkle-icon">✨</span>
+                <span id="transmute-btn-text">Transformar em Música Serena</span>
+              </button>
+            </div>
+
+            <!-- ANIMAÇÃO DE PROGRESSO DA TRANSFORMAÇÃO -->
+            <div id="transforming-progress-box" class="transform-progress-container hidden">
+              <div class="progress-bar-glow">
+                <div class="progress-bar-fill" id="transform-progress-fill"></div>
+              </div>
+              <span id="transform-status-text" class="transform-status-label">Iniciando transmutação acústica...</span>
+            </div>
+
+            <!-- RESULTADO: COMPARADOR LADO A LADO E AÇÕES -->
+            <div id="transformation-result-card" class="result-card hidden">
+              <div class="result-header">
+                <span class="result-badge">TRANSFORMAÇÃO CONCLUÍDA</span>
+                <h3>Sua Música Serena está Pronta! 🍃</h3>
+                <p>O ruído foi filtrado e afinado em harmonia com base no tema escolhido.</p>
+              </div>
+
+              <div class="comparison-grid">
+                <!-- Card Esquerda: Ruído Original -->
+                <div class="comparison-panel original-panel">
+                  <div class="panel-header">
+                    <span class="panel-tag original-tag">ÁUDIO ORIGINAL (RUÍDO)</span>
+                    <strong id="res-original-title">Gravação do Ambiente</strong>
+                  </div>
+                  <div class="waveform-mock noisy-wave">
+                    <span>Ruído Áspero Gravado</span>
+                  </div>
+                  <button id="btn-play-res-original" class="btn-play-comparison">
+                    <span>▶ Ouvir Original</span>
+                  </button>
+                </div>
+
+                <!-- Card Direita: Música Serena -->
+                <div class="comparison-panel serene-panel">
+                  <div class="panel-header">
+                    <span class="panel-tag serene-tag">MÚSICA CALMA TRANSFORMADA</span>
+                    <strong id="res-serene-title">Harmonia Zen • Taças & Sinos</strong>
+                  </div>
+                  <div class="waveform-mock serene-wave">
+                    <span>Ondas Harmônicas Puras & Reverb</span>
+                  </div>
+                  <button id="btn-play-res-serene" class="btn-play-comparison primary">
+                    <span>▶ Ouvir Música Serena</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Ações do Resultado -->
+              <div class="result-actions-toolbar">
+                <button id="btn-save-to-playlist" class="btn-primary-medium">
+                  <span>➕ Salvar na Minha Playlist</span>
+                </button>
+                <button id="btn-share-result" class="btn-secondary">
+                  <span>🔗 Compartilhar com Amigos</span>
+                </button>
+                <a id="btn-download-wav" class="btn-secondary download-link" download="sereno-musica-transformada.wav">
+                  <span>⬇️ Baixar Áudio (.wav)</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             ABA: TRANSMUTADOR AO VIVO (MICROFONE CONTÍNUO & VISUALIZADOR)
+             ================================================================ -->
+        <section id="view-live" class="view-tab">
+          <!-- Visualizador Central & Guia de Respiração -->
+          <div class="visualizer-section">
+            <div class="canvas-wrapper">
+              <canvas id="visualizer-canvas"></canvas>
+
+              <!-- Orbe de Respiração -->
+              <div id="breath-guide" class="breath-guide hidden">
+                <div class="breath-circle"></div>
+                <span id="breath-label" class="breath-label">Inspire...</span>
+              </div>
+
+              <!-- Badges Acústicas -->
+              <div class="acoustic-status-overlay">
+                <div class="status-badge" id="status-badge">
+                  <span class="status-indicator"></span>
+                  <span id="status-text">Microfone pronto para transmutar ao vivo</span>
+                </div>
+                <div class="detected-note-badge" id="detected-note-badge">
+                  <span class="note-label">Nota</span>
+                  <span id="current-note-display">--</span>
+                </div>
+              </div>
+
+              <!-- Overlay Inicial -->
+              <div class="hero-start-overlay" id="start-overlay">
+                <div class="hero-card">
+                  <div class="pulse-aura"></div>
+                  <button id="btn-toggle-audio" class="btn-primary-large">
+                    <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+                      <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                      <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+                    </svg>
+                    <span>Ativar Escuta Ao Vivo</span>
+                  </button>
+                  <p class="hero-instruction">
+                    Deixe o microfone aberto para ouvir os sons do seu quarto sendo convertidos em sinos e harmonia em tempo real.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Medidor de Decibéis -->
+          <div class="meter-bar-container">
+            <div class="meter-label-row">
+              <span>Energia Sonora em Tempo Real</span>
+              <span id="db-level-text">Silêncio suave</span>
+            </div>
+            <div class="meter-track">
+              <div class="meter-fill" id="meter-fill"></div>
+              <div class="meter-threshold-marker" id="meter-threshold-marker"></div>
+            </div>
+          </div>
+
+          <!-- Controles de Harmonia e Mixagem -->
+          <div class="controls-grid">
+            <div class="control-card">
+              <div class="card-header">
+                <h3>Harmonia & Escala</h3>
+              </div>
+              <div class="input-group">
+                <label>Tom Base</label>
+                <div class="pill-group" id="key-selector">
+                  <button class="pill-btn active" data-key="C">C</button>
+                  <button class="pill-btn" data-key="D">D</button>
+                  <button class="pill-btn" data-key="E">E</button>
+                  <button class="pill-btn" data-key="F">F</button>
+                  <button class="pill-btn" data-key="G">G</button>
+                  <button class="pill-btn" data-key="A">A</button>
+                </div>
+              </div>
+              <div class="input-group">
+                <label for="select-scale">Escala</label>
+                <select id="select-scale" class="custom-select">
+                  <option value="hirajoshi" selected>Zen Hirajoshi (Meditativa)</option>
+                  <option value="pentatonicMajor">Pentatônica Maior (Pura)</option>
+                  <option value="lydian">Lydian Celestial (Espacial)</option>
+                  <option value="dorian">Dórico Noturno (Suave)</option>
+                  <option value="ambientChords">Acordes Ambient (Abertos)</option>
+                </select>
+              </div>
+              <div class="checkbox-row">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="toggle-breath">
+                  <span class="slider round"></span>
+                </label>
+                <span class="toggle-label">Guia de Respiração (4-4-4)</span>
+              </div>
+            </div>
+
+            <div class="control-card">
+              <div class="card-header">
+                <h3>Sensibilidade Acústica</h3>
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="slider-sensitivity">Sensibilidade</label>
+                  <span id="val-sensitivity">Moderada</span>
+                </div>
+                <input type="range" id="slider-sensitivity" min="1" max="100" value="65">
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="slider-density">Densidade</label>
+                  <span id="val-density">Suave</span>
+                </div>
+                <input type="range" id="slider-density" min="10" max="100" value="50">
+              </div>
+            </div>
+
+            <div class="control-card">
+              <div class="card-header">
+                <h3>Mixagem & Texturas</h3>
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="slider-bells">Sinos & Taças</label>
+                  <span id="val-bells">75%</span>
+                </div>
+                <input type="range" id="slider-bells" min="0" max="100" value="75">
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="slider-drone">Drone / Pad</label>
+                  <span id="val-drone">60%</span>
+                </div>
+                <input type="range" id="slider-drone" min="0" max="100" value="60">
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="slider-resonance">Filtros Ressonadores</label>
+                  <span id="val-resonance">80%</span>
+                </div>
+                <input type="range" id="slider-resonance" min="0" max="100" value="80">
+              </div>
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="slider-reverb">Reverb de Catedral</label>
+                  <span id="val-reverb">85%</span>
+                </div>
+                <input type="range" id="slider-reverb" min="10" max="100" value="85">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             ABA: DETALHES DA PLAYLIST (ESTILO SPOTIFY)
+             ================================================================ -->
+        <section id="view-playlist" class="view-tab">
+          <div class="playlist-header">
+            <div class="playlist-cover-large" id="playlist-view-cover">
+              <span id="playlist-cover-icon">🎵</span>
+            </div>
+            <div class="playlist-header-meta">
+              <span class="playlist-type-tag">PLAYLIST</span>
+              <h2 class="playlist-title-display" id="playlist-view-title">Foco Profundo</h2>
+              <p class="playlist-desc-display" id="playlist-view-desc">Harmonias zen e frequências estáveis para concentração.</p>
+              <div class="playlist-stats-row">
+                <strong id="playlist-view-author">Sereno</strong> •
+                <span id="playlist-view-count">3 faixas</span>,
+                <span id="playlist-view-duration">aprox. 13 min</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="playlist-actions-bar">
+            <button id="btn-playlist-play-all" class="btn-play-hero" title="Tocar Playlist">
+              <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+            </button>
+
+            <button id="btn-playlist-share" class="btn-action-icon" title="Compartilhar com Amigos">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"></circle>
+                <circle cx="6" cy="12" r="3"></circle>
+                <circle cx="18" cy="19" r="3"></circle>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+              </svg>
+            </button>
+
+            <button id="btn-playlist-delete" class="btn-action-icon danger hidden" title="Excluir Playlist">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+            </button>
+          </div>
+
+          <div class="tracklist-container">
+            <div class="tracklist-header-row">
+              <div class="col-num">#</div>
+              <div class="col-title">TÍTULO</div>
+              <div class="col-preset">PAISAGEM / TEMA</div>
+              <div class="col-date">DATA</div>
+              <div class="col-dur">⏱️</div>
+            </div>
+            <div class="tracklist-body" id="playlist-tracks-body">
+              <!-- Renderizado dinamicamente -->
+            </div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             ABA: EXPLORAR
+             ================================================================ -->
+        <section id="view-explore" class="view-tab">
+          <div class="explore-hero">
+            <h2>Descubra Frequências Restauradoras</h2>
+            <p>Selecione um clima ou paisagem acústica para focar, relaxar ou dormir com tranquilidade.</p>
+          </div>
+          <div class="explore-grid" id="explore-cards-grid">
+            <!-- Cards de Playlists & Modos -->
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- ====================================================================
+       BARRA DE REPRODUÇÃO FIXA INFERIOR (PLAYER ESTILO SPOTIFY)
+       ==================================================================== -->
+  <footer class="player-bar">
+    <div class="player-left">
+      <div class="player-cover" id="player-track-cover">
+        <img src="assets/zen-stones-thumb.png" alt="Capa da Faixa" class="player-cover-img" id="player-cover-img">
+        <span id="player-cover-emoji" class="hidden">🎍</span>
+      </div>
+      <div class="player-track-info">
+        <div class="player-track-title" id="player-title">Ressonância do Quarto</div>
+        <div class="player-track-artist" id="player-artist">Sereno • Jardim Zen</div>
+      </div>
+      <button class="player-heart-btn" id="player-like-btn" title="Salvar nas Músicas Curtidas">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="player-center">
+      <div class="player-controls">
+        <button class="player-control-btn" id="player-btn-shuffle" title="Aleatório">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+        </button>
+
+        <button class="player-control-btn" id="player-btn-prev" title="Anterior">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <polygon points="19 20 9 12 19 4 19 20"></polygon>
+            <line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"></line>
+          </svg>
+        </button>
+
+        <button class="player-btn-play-pause" id="player-btn-toggle" title="Reproduzir / Pausar">
+          <svg id="player-play-icon" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <svg id="player-pause-icon" class="hidden" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </button>
+
+        <button class="player-control-btn" id="player-btn-next" title="Próxima">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <polygon points="5 4 15 12 5 20 5 4"></polygon>
+            <line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"></line>
+          </svg>
+        </button>
+
+        <button class="player-control-btn" id="player-btn-repeat" title="Repetir">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="17 1 21 5 17 9"></polyline>
+            <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+            <polyline points="7 23 3 19 7 15"></polyline>
+            <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="player-progress-bar">
+        <span class="time-label" id="player-current-time">0:00</span>
+        <div class="progress-track" id="player-progress-track">
+          <div class="progress-fill" id="player-progress-fill"></div>
+        </div>
+        <span class="time-label" id="player-total-time">4:20</span>
+      </div>
+    </div>
+
+    <div class="player-right">
+      <button class="player-action-tag" id="btn-player-studio-mode" title="Voltar para o Estúdio">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+          <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+        </svg>
+        <span>Estúdio</span>
+      </button>
+
+      <div class="volume-slider-box">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+        </svg>
+        <input type="range" id="player-volume-slider" min="0" max="100" value="85" title="Volume Geral">
+      </div>
+    </div>
+  </footer>
+
+  <!-- ====================================================================
+       MODAIS (CRIAR PLAYLIST, COMPARTILHAR COM AMIGOS & SALVAR GRAVAÇÃO)
+       ==================================================================== -->
+
+  <!-- Modal 1: Criar Playlist -->
+  <div class="modal-backdrop hidden" id="modal-create-playlist">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Criar Nova Playlist</h3>
+        <button class="modal-close-btn" data-close="modal-create-playlist">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-input-group">
+          <label for="input-playlist-name">Nome da Playlist</label>
+          <input type="text" id="input-playlist-name" placeholder="Ex: Chuva na Janela, Estudo Zen..." maxlength="45">
+        </div>
+        <div class="modal-input-group">
+          <label for="input-playlist-desc">Descrição (opcional)</label>
+          <input type="text" id="input-playlist-desc" placeholder="Ex: Músicas criadas com o som do meu ambiente" maxlength="90">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-text" data-close="modal-create-playlist">Cancelar</button>
+        <button class="btn-primary-medium" id="btn-confirm-create-playlist">Criar Playlist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 2: Compartilhar com Amigos (Spotify Share + QR Code) -->
+  <div class="modal-backdrop hidden" id="modal-share">
+    <div class="modal-card modal-share-card">
+      <div class="modal-header">
+        <h3 id="modal-share-title">Compartilhar com Amigos</h3>
+        <button class="modal-close-btn" data-close="modal-share">✕</button>
+      </div>
+      <div class="modal-body share-body-grid">
+        <div class="share-preview-box">
+          <div class="share-preview-cover" id="share-cover-display">✨</div>
+          <h4 id="share-item-name">Foco Profundo</h4>
+          <p id="share-item-desc">Ouça esta paisagem musical suave criada com som ambiente.</p>
+        </div>
+
+        <div class="share-qr-section">
+          <canvas id="share-qr-canvas"></canvas>
+          <small>Aponte a câmera do celular para abrir</small>
+        </div>
+
+        <div class="share-link-row">
+          <input type="text" id="share-link-input" readonly>
+          <button id="btn-copy-share-link" class="btn-primary-small">Copiar Link</button>
+        </div>
+
+        <button id="btn-native-share" class="btn-secondary share-native-btn">
+          <span>📲 Compartilhar no WhatsApp / Redes</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal 3: Salvar na Playlist -->
+  <div class="modal-backdrop hidden" id="modal-save-track">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Salvar Música na Playlist</h3>
+        <button class="modal-close-btn" data-close="modal-save-track">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-input-group">
+          <label for="input-track-title">Nome da Música</label>
+          <input type="text" id="input-track-title" placeholder="Ex: Manhã Serena no Escritório">
+        </div>
+        <div class="modal-input-group">
+          <label for="select-target-playlist">Escolha a Playlist</label>
+          <select id="select-target-playlist" class="custom-select">
+            <!-- Populado via JS -->
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-text" data-close="modal-save-track">Descartar</button>
+        <button class="btn-primary-medium" id="btn-confirm-save-track">Salvar na Playlist</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast de Notificação -->
+  <div id="toast-notification" class="toast-notification hidden">
+    <span id="toast-message">Música salva com sucesso!</span>
+  </div>
+
+  <!-- Elemento de áudio auxiliar para previews -->
+  <audio id="aux-preview-player" style="display:none;"></audio>
+
+  <!-- Scripts -->
+  <script src="playlist-manager.js"></script>
+  <script src="audio-engine.js"></script>
+  <script src="visualizer.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

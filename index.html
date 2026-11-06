@@ -141,6 +141,35 @@
         </div>
       </header>
 
+      <!-- Fitas e Ondas Ethereal Zen no Fundo da Área Principal -->
+      <div class="zen-bg-ribbons" aria-hidden="true">
+        <svg viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none">
+          <path d="M-100 180 C260 70, 680 260, 1500 110" stroke="url(#ribbonGrad1)" stroke-width="2.5" opacity="0.45" />
+          <path d="M-100 220 C320 100, 780 300, 1500 150" stroke="url(#ribbonGrad1)" stroke-width="1.8" opacity="0.32" />
+          <path d="M-100 260 C380 130, 880 340, 1500 190" stroke="url(#ribbonGrad2)" stroke-width="1.2" opacity="0.22" />
+          <path d="M350 -60 C650 220, 1050 90, 1500 340" stroke="url(#ribbonGrad2)" stroke-width="2" opacity="0.3" />
+          <path d="M550 -60 C800 280, 1180 140, 1500 400" stroke="url(#ribbonGrad1)" stroke-width="1.5" opacity="0.2" />
+          <defs>
+            <linearGradient id="ribbonGrad1" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#c084fc" stop-opacity="0.1" />
+              <stop offset="50%" stop-color="#8b5cf6" stop-opacity="0.6" />
+              <stop offset="100%" stop-color="#a855f7" stop-opacity="0.15" />
+            </linearGradient>
+            <linearGradient id="ribbonGrad2" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#e879f9" stop-opacity="0.08" />
+              <stop offset="60%" stop-color="#c084fc" stop-opacity="0.45" />
+              <stop offset="100%" stop-color="#38bdf8" stop-opacity="0.1" />
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- Pedras Zen Equilibradas sobre a Água com Lavanda (Fiel ao Mockup) -->
+      <div class="zen-stones-backdrop" aria-hidden="true">
+        <img src="assets/zen-stones-decor.png" alt="Pedras Zen & Lavanda" class="zen-stones-img">
+        <div class="water-ripple-aura"></div>
+      </div>
+
       <!-- Conteúdo com Abas Alternáveis -->
       <div class="views-wrapper">
         <!-- ================================================================
@@ -148,11 +177,6 @@
              ================================================================ -->
         <section id="view-transform" class="view-tab active">
           <div class="studio-container">
-            <!-- Decoração Zen Stones & Bamboo Water no fundo direito (Fiel ao Mockup) -->
-            <div class="zen-stones-backdrop" aria-hidden="true">
-              <img src="assets/zen-stones-decor.png" alt="Pedras Zen & Lavanda" class="zen-stones-img">
-            </div>
-
             <div class="studio-header">
               <div class="lotus-header-icon-wrap">
                 <svg class="lotus-header-icon" viewBox="0 0 64 48" fill="none" stroke="#8b5cf6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -209,8 +233,8 @@
                   </div>
 
                   <div class="sample-options-row">
-                    <span class="sample-prompt-text">Ou teste com um ruído pronto:</span>
-                    <div class="sample-pills-wrap">
+                    <div class="sample-pills-inline-row">
+                      <span class="sample-prompt-text">Ou teste com um ruído pronto:</span>
                       <button class="pill-sample-btn" data-sample="office"><span class="pill-btn-icon">💻</span> Escritório & Teclado</button>
                       <button class="pill-sample-btn" data-sample="cafe"><span class="pill-btn-icon">☕</span> Cafeteria & Murmúrio</button>
                       <button class="pill-sample-btn" data-sample="street"><span class="pill-btn-icon">🚗</span> Trânsito na Rua</button>
